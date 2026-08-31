@@ -79,7 +79,7 @@ h1 {
 .locate-button {
   position: absolute;
   right: 12px;
-  bottom: calc(max(12px, env(safe-area-inset-bottom)) + 142px);
+  top: max(16px, env(safe-area-inset-top));
   z-index: 1;
   min-height: 44px;
   padding: 0 16px;
@@ -186,7 +186,7 @@ h2 {
 
   .locate-button {
     right: 24px;
-    bottom: 178px;
+    top: 24px;
   }
 
   .maplibregl-ctrl-bottom-right {
