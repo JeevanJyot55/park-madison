@@ -14,21 +14,36 @@ const SERVICE_AREA = {
     type: 'Polygon',
     coordinates: [
       [
-        [-89.4318, 43.0769],
-        [-89.4209, 43.0809],
-        [-89.4019, 43.0831],
-        [-89.3828, 43.0822],
-        [-89.3737, 43.0781],
-        [-89.3696, 43.0712],
-        [-89.3743, 43.0652],
-        [-89.3827, 43.0611],
-        [-89.3935, 43.0566],
-        [-89.4058, 43.0525],
-        [-89.4212, 43.0557],
-        [-89.4338, 43.0631],
-        [-89.4387, 43.0701],
-        [-89.4318, 43.0769],
+        [-89.4386, 43.0792],
+        [-89.4302, 43.0862],
+        [-89.4116, 43.0888],
+        [-89.3861, 43.0871],
+        [-89.3692, 43.0803],
+        [-89.3648, 43.0694],
+        [-89.3748, 43.0595],
+        [-89.3944, 43.0521],
+        [-89.4172, 43.0538],
+        [-89.4336, 43.0627],
+        [-89.442, 43.0711],
+        [-89.4386, 43.0792],
       ],
+    ],
+  },
+};
+const SERVICE_MASK = {
+  type: 'Feature',
+  properties: {},
+  geometry: {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [-180, 90],
+        [180, 90],
+        [180, -90],
+        [-180, -90],
+        [-180, 90],
+      ],
+      SERVICE_AREA.geometry.coordinates[0],
     ],
   },
 };
@@ -71,13 +86,28 @@ function App() {
         data: SERVICE_AREA,
       });
 
+      mapRef.current.addSource('service-mask', {
+        type: 'geojson',
+        data: SERVICE_MASK,
+      });
+
+      mapRef.current.addLayer({
+        id: 'outside-service-area',
+        type: 'fill',
+        source: 'service-mask',
+        paint: {
+          'fill-color': '#0d1611',
+          'fill-opacity': 0.22,
+        },
+      });
+
       mapRef.current.addLayer({
         id: 'service-area-fill',
         type: 'fill',
         source: 'service-area',
         paint: {
           'fill-color': '#35b86f',
-          'fill-opacity': 0.2,
+          'fill-opacity': 0.12,
         },
       });
 
