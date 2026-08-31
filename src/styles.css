@@ -48,7 +48,7 @@ select {
   position: absolute;
   top: max(16px, env(safe-area-inset-top));
   left: 16px;
-  right: 16px;
+  right: 116px;
   z-index: 1;
   max-width: 440px;
   padding: 16px;
@@ -74,6 +74,10 @@ h1 {
   font-size: 1.65rem;
   line-height: 1;
   letter-spacing: 0;
+}
+
+.destination-form {
+  margin-top: 14px;
 }
 
 .locate-button {
@@ -209,10 +213,6 @@ h1 {
   outline: none;
 }
 
-.sheet-section {
-  margin-top: 16px;
-}
-
 h2 {
   margin: 0;
   color: #102016;
@@ -265,7 +265,7 @@ h2 {
 }
 
 .maplibregl-ctrl-bottom-right {
-  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 210px);
+  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 132px);
   right: 16px;
 }
 
@@ -292,7 +292,7 @@ h2 {
   }
 
   .maplibregl-ctrl-bottom-right {
-    bottom: 270px;
+    bottom: 190px;
     right: 24px;
   }
 }

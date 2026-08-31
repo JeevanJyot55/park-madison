@@ -220,19 +220,6 @@ function App() {
         <header className="map-header" aria-labelledby="app-title">
           <p className="eyebrow">Madison, Wisconsin</p>
           <h1 id="app-title">Park Madison</h1>
-        </header>
-
-        <button
-          className="locate-button"
-          type="button"
-          onClick={handleLocateUser}
-          disabled={locationStatus === 'loading'}
-        >
-          {locationStatus === 'loading' ? 'Locating...' : 'Locate me'}
-        </button>
-
-        <aside className="parking-sheet" aria-labelledby="parking-sheet-title">
-          <div className="sheet-handle" aria-hidden="true" />
           <form className="destination-form" onSubmit={handleDestinationSearch}>
             <label className="destination-field" htmlFor="destination-search">
               <span className="sheet-label">Where are you going?</span>
@@ -269,10 +256,21 @@ function App() {
               </div>
             )}
           </form>
-          <div className="sheet-section">
-            <p className="sheet-label">Current area</p>
-            <h2 id="parking-sheet-title">UW-Madison / downtown</h2>
-          </div>
+        </header>
+
+        <button
+          className="locate-button"
+          type="button"
+          onClick={handleLocateUser}
+          disabled={locationStatus === 'loading'}
+        >
+          {locationStatus === 'loading' ? 'Locating...' : 'Locate me'}
+        </button>
+
+        <aside className="parking-sheet" aria-labelledby="parking-sheet-title">
+          <div className="sheet-handle" aria-hidden="true" />
+          <p className="sheet-label">Current area</p>
+          <h2 id="parking-sheet-title">UW-Madison / downtown</h2>
           <p
             className={`sheet-copy status-${
               destinationStatus === 'error' ? 'error' : locationStatus
