@@ -179,6 +179,36 @@ h1 {
   cursor: wait;
 }
 
+.suggestions-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  max-height: 164px;
+  overflow-y: auto;
+}
+
+.suggestion-option {
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 10px;
+  border: 1px solid rgba(23, 33, 27, 0.1);
+  border-radius: 8px;
+  color: #17211b;
+  background: rgba(255, 255, 255, 0.92);
+  font-size: 0.88rem;
+  font-weight: 650;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+}
+
+.suggestion-option:focus,
+.suggestion-option:hover {
+  border-color: rgba(43, 122, 75, 0.45);
+  background: #f2f8f3;
+  outline: none;
+}
+
 .sheet-section {
   margin-top: 16px;
 }

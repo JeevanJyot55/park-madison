@@ -14,6 +14,7 @@ function App() {
   const userMarkerRef = useRef(null);
   const destinationMarkerRef = useRef(null);
   const [destinationQuery, setDestinationQuery] = useState('');
+  const [destinationSuggestions, setDestinationSuggestions] = useState([]);
   const [destinationStatus, setDestinationStatus] = useState('idle');
   const [locationStatus, setLocationStatus] = useState('idle');
   const [locationMessage, setLocationMessage] = useState(
@@ -47,73 +48,119 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const query = destinationQuery.trim();
+
+    if (query.length < 2) {
+      setDestinationSuggestions([]);
+      setDestinationStatus('idle');
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    const searchDelay = window.setTimeout(async () => {
+      setDestinationStatus('loading');
+
+      const searchParams = new URLSearchParams({
+        q: query,
+        lat: '43.0731',
+        lon: '-89.4036',
+        limit: '5',
+      });
+
+      try {
+        const response = await fetch(
+          `https://photon.komoot.io/api/?${searchParams.toString()}`,
+          { signal: controller.signal },
+        );
+
+        if (!response.ok) {
+          throw new Error('Destination suggestions failed.');
+        }
+
+        const data = await response.json();
+        const suggestions = data.features
+          .filter((feature) => {
+            const { city, county, state } = feature.properties;
+            return (
+              city === 'Madison' ||
+              county === 'Dane' ||
+              state === 'WI' ||
+              state === 'Wisconsin'
+            );
+          })
+          .slice(0, 5);
+
+        setDestinationSuggestions(suggestions);
+        setDestinationStatus(suggestions.length > 0 ? 'idle' : 'error');
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          setDestinationSuggestions([]);
+          setDestinationStatus('error');
+        }
+      }
+    }, 350);
+
+    return () => {
+      controller.abort();
+      window.clearTimeout(searchDelay);
+    };
+  }, [destinationQuery]);
+
+  const getSuggestionLabel = (suggestion) => {
+    const { name, housenumber, street, city, state } = suggestion.properties;
+    const address = [housenumber, street].filter(Boolean).join(' ');
+    const area = [city, state].filter(Boolean).join(', ');
+
+    return [name, address, area].filter(Boolean).join(' · ');
+  };
+
+  const pinDestination = (suggestion) => {
+    if (!mapRef.current) {
+      return;
+    }
+
+    const destinationPosition = suggestion.geometry.coordinates;
+
+    if (!destinationMarkerRef.current) {
+      const markerElement = document.createElement('div');
+      markerElement.className = 'destination-marker';
+      destinationMarkerRef.current = new Marker({ element: markerElement });
+    }
+
+    destinationMarkerRef.current
+      .setLngLat(destinationPosition)
+      .addTo(mapRef.current);
+
+    mapRef.current.flyTo({
+      center: destinationPosition,
+      zoom: 15,
+      essential: true,
+    });
+
+    const label = getSuggestionLabel(suggestion);
+    setDestinationQuery(suggestion.properties.name ?? label);
+    setDestinationSuggestions([]);
+    setDestinationStatus('success');
+    setLocationMessage(`Destination pinned: ${label}`);
+  };
+
   const handleDestinationSearch = async (event) => {
     event.preventDefault();
 
-    const query = destinationQuery.trim();
+    if (destinationSuggestions.length > 0) {
+      pinDestination(destinationSuggestions[0]);
+      return;
+    }
 
-    if (!query) {
+    if (!destinationQuery.trim()) {
       setDestinationStatus('error');
       setLocationMessage('Enter a destination to search near Madison.');
       return;
     }
 
-    setDestinationStatus('loading');
-    setLocationMessage(`Searching for "${query}"...`);
-
-    const searchParams = new URLSearchParams({
-      q: `${query}, Madison, WI`,
-      format: 'jsonv2',
-      limit: '1',
-      addressdetails: '1',
-      viewbox: '-89.533,43.017,-89.305,43.145',
-      bounded: '1',
-    });
-
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?${searchParams.toString()}`,
-      );
-
-      if (!response.ok) {
-        throw new Error('Destination search failed.');
-      }
-
-      const [result] = await response.json();
-
-      if (!result || !mapRef.current) {
-        setDestinationStatus('error');
-        setLocationMessage('No Madison destination found for that search.');
-        return;
-      }
-
-      const destinationPosition = [
-        Number.parseFloat(result.lon),
-        Number.parseFloat(result.lat),
-      ];
-
-      if (!destinationMarkerRef.current) {
-        const markerElement = document.createElement('div');
-        markerElement.className = 'destination-marker';
-        destinationMarkerRef.current = new Marker({ element: markerElement });
-      }
-
-      destinationMarkerRef.current
-        .setLngLat(destinationPosition)
-        .addTo(mapRef.current);
-
-      mapRef.current.flyTo({
-        center: destinationPosition,
-        zoom: 15,
-        essential: true,
-      });
-
-      setDestinationStatus('success');
-      setLocationMessage(`Destination pinned: ${result.display_name}`);
-    } catch {
-      setDestinationStatus('error');
-      setLocationMessage('Destination search is unavailable right now.');
-    }
+    setDestinationStatus('error');
+    setLocationMessage('Choose one of the suggested Madison destinations.');
   };
 
   const handleLocateUser = () => {
@@ -207,12 +254,30 @@ function App() {
                 </button>
               </span>
             </label>
+            {destinationSuggestions.length > 0 && (
+              <div className="suggestions-list">
+                {destinationSuggestions.map((suggestion) => (
+                  <button
+                    className="suggestion-option"
+                    key={`${suggestion.properties.osm_type}-${suggestion.properties.osm_id}`}
+                    type="button"
+                    onClick={() => pinDestination(suggestion)}
+                  >
+                    {getSuggestionLabel(suggestion)}
+                  </button>
+                ))}
+              </div>
+            )}
           </form>
           <div className="sheet-section">
             <p className="sheet-label">Current area</p>
             <h2 id="parking-sheet-title">UW-Madison / downtown</h2>
           </div>
-          <p className={`sheet-copy status-${locationStatus}`}>
+          <p
+            className={`sheet-copy status-${
+              destinationStatus === 'error' ? 'error' : locationStatus
+            }`}
+          >
             {locationMessage}
           </p>
         </aside>
