@@ -76,6 +76,28 @@ h1 {
   letter-spacing: 0;
 }
 
+.locate-button {
+  position: absolute;
+  right: 12px;
+  bottom: calc(max(12px, env(safe-area-inset-bottom)) + 142px);
+  z-index: 1;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(23, 33, 27, 0.12);
+  border-radius: 8px;
+  color: #102016;
+  background: rgba(250, 252, 249, 0.96);
+  box-shadow: 0 10px 26px rgba(16, 32, 22, 0.14);
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+}
+
+.locate-button:disabled {
+  color: #6f7c72;
+  cursor: wait;
+}
+
 .parking-sheet {
   position: absolute;
   right: 12px;
@@ -121,6 +143,25 @@ h2 {
   font-size: 0.95rem;
 }
 
+.status-success {
+  color: #1c6b3a;
+}
+
+.status-error {
+  color: #9b2f2f;
+}
+
+.user-location-marker {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  background: #1677ff;
+  box-shadow:
+    0 0 0 6px rgba(22, 119, 255, 0.2),
+    0 6px 18px rgba(16, 32, 22, 0.24);
+}
+
 .maplibregl-ctrl-bottom-right {
   bottom: calc(max(16px, env(safe-area-inset-bottom)) + 132px);
   right: 16px;
@@ -141,6 +182,11 @@ h2 {
     left: auto;
     width: 360px;
     padding: 12px 18px 18px;
+  }
+
+  .locate-button {
+    right: 24px;
+    bottom: 178px;
   }
 
   .maplibregl-ctrl-bottom-right {

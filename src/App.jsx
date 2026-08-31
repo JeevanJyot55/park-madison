@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { Map, NavigationControl, setWorkerUrl } from 'maplibre-gl';
+import { useEffect, useRef, useState } from 'react';
+import { Map, Marker, NavigationControl, setWorkerUrl } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 
@@ -11,6 +11,11 @@ setWorkerUrl(workerUrl);
 function App() {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
+  const userMarkerRef = useRef(null);
+  const [locationStatus, setLocationStatus] = useState('idle');
+  const [locationMessage, setLocationMessage] = useState(
+    'Nearby parking options will appear here once we add the first data source.',
+  );
 
   useEffect(() => {
     if (mapRef.current || !mapContainerRef.current) {
@@ -30,10 +35,61 @@ function App() {
     );
 
     return () => {
+      userMarkerRef.current?.remove();
+      userMarkerRef.current = null;
       mapRef.current?.remove();
       mapRef.current = null;
     };
   }, []);
+
+  const handleLocateUser = () => {
+    if (!navigator.geolocation) {
+      setLocationStatus('error');
+      setLocationMessage('Current location is not available in this browser.');
+      return;
+    }
+
+    setLocationStatus('loading');
+    setLocationMessage('Finding your current location...');
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const userPosition = [
+          position.coords.longitude,
+          position.coords.latitude,
+        ];
+
+        if (!mapRef.current) {
+          return;
+        }
+
+        if (!userMarkerRef.current) {
+          const markerElement = document.createElement('div');
+          markerElement.className = 'user-location-marker';
+          userMarkerRef.current = new Marker({ element: markerElement });
+        }
+
+        userMarkerRef.current.setLngLat(userPosition).addTo(mapRef.current);
+        mapRef.current.flyTo({
+          center: userPosition,
+          zoom: 15,
+          essential: true,
+        });
+
+        setLocationStatus('success');
+        setLocationMessage('Current location found. Parking options will use this later.');
+      },
+      () => {
+        setLocationStatus('error');
+        setLocationMessage('Location permission was denied or unavailable.');
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 30000,
+        timeout: 10000,
+      },
+    );
+  };
 
   return (
     <main className="app-shell">
@@ -45,13 +101,21 @@ function App() {
           <h1 id="app-title">Park Madison</h1>
         </header>
 
+        <button
+          className="locate-button"
+          type="button"
+          onClick={handleLocateUser}
+          disabled={locationStatus === 'loading'}
+        >
+          {locationStatus === 'loading' ? 'Locating...' : 'Locate me'}
+        </button>
+
         <aside className="parking-sheet" aria-labelledby="parking-sheet-title">
           <div className="sheet-handle" aria-hidden="true" />
           <p className="sheet-label">Current area</p>
           <h2 id="parking-sheet-title">UW-Madison / downtown</h2>
-          <p className="sheet-copy">
-            Nearby parking options will appear here once we add the first data
-            source.
+          <p className={`sheet-copy status-${locationStatus}`}>
+            {locationMessage}
           </p>
         </aside>
       </section>
