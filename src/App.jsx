@@ -5,6 +5,43 @@ import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 
 const MADISON_CENTER = [-89.4036, 43.0731];
 const MAP_STYLE_URL = 'https://tiles.openfreemap.org/styles/liberty';
+const SERVICE_AREA = {
+  type: 'Feature',
+  properties: {
+    name: 'Early access area',
+  },
+  geometry: {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [-89.4298, 43.0892],
+        [-89.3794, 43.0892],
+        [-89.3708, 43.0675],
+        [-89.3927, 43.0489],
+        [-89.4318, 43.0554],
+        [-89.4402, 43.0735],
+        [-89.4298, 43.0892],
+      ],
+    ],
+  },
+};
+const SERVICE_MASK = {
+  type: 'Feature',
+  properties: {},
+  geometry: {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [-180, 90],
+        [180, 90],
+        [180, -90],
+        [-180, -90],
+        [-180, 90],
+      ],
+      SERVICE_AREA.geometry.coordinates[0],
+    ],
+  },
+};
 
 setWorkerUrl(workerUrl);
 
@@ -18,7 +55,7 @@ function App() {
   const [destinationStatus, setDestinationStatus] = useState('idle');
   const [locationStatus, setLocationStatus] = useState('idle');
   const [locationMessage, setLocationMessage] = useState(
-    'Nearby parking options will appear here once we add the first data source.',
+    'Search inside the highlighted area to choose a destination.',
   );
 
   useEffect(() => {
@@ -37,6 +74,49 @@ function App() {
       new NavigationControl({ showCompass: false }),
       'bottom-right',
     );
+
+    mapRef.current.on('load', () => {
+      mapRef.current.addSource('service-area', {
+        type: 'geojson',
+        data: SERVICE_AREA,
+      });
+
+      mapRef.current.addSource('service-mask', {
+        type: 'geojson',
+        data: SERVICE_MASK,
+      });
+
+      mapRef.current.addLayer({
+        id: 'outside-service-area',
+        type: 'fill',
+        source: 'service-mask',
+        paint: {
+          'fill-color': '#0d1611',
+          'fill-opacity': 0.32,
+        },
+      });
+
+      mapRef.current.addLayer({
+        id: 'service-area-fill',
+        type: 'fill',
+        source: 'service-area',
+        paint: {
+          'fill-color': '#2b7a4b',
+          'fill-opacity': 0.1,
+        },
+      });
+
+      mapRef.current.addLayer({
+        id: 'service-area-border',
+        type: 'line',
+        source: 'service-area',
+        paint: {
+          'line-color': '#1f6f43',
+          'line-width': 3,
+          'line-opacity': 0.9,
+        },
+      });
+    });
 
     return () => {
       userMarkerRef.current?.remove();
@@ -269,8 +349,8 @@ function App() {
 
         <aside className="parking-sheet" aria-labelledby="parking-sheet-title">
           <div className="sheet-handle" aria-hidden="true" />
-          <p className="sheet-label">Current area</p>
-          <h2 id="parking-sheet-title">UW-Madison / downtown</h2>
+          <p className="sheet-label">Early access area</p>
+          <h2 id="parking-sheet-title">Campus and downtown</h2>
           <p
             className={`sheet-copy status-${
               destinationStatus === 'error' ? 'error' : locationStatus
