@@ -134,6 +134,12 @@ h1 {
   gap: 8px;
 }
 
+.destination-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
 .destination-field input {
   width: 100%;
   min-height: 46px;
@@ -155,6 +161,22 @@ h1 {
   box-shadow:
     0 0 0 3px rgba(43, 122, 75, 0.14),
     inset 0 1px 0 rgba(16, 32, 22, 0.04);
+}
+
+.destination-submit {
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid rgba(23, 33, 27, 0.12);
+  border-radius: 8px;
+  color: #ffffff;
+  background: #1f6f43;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.destination-submit:disabled {
+  background: #728477;
+  cursor: wait;
 }
 
 .sheet-section {
@@ -192,6 +214,24 @@ h2 {
   box-shadow:
     0 0 0 6px rgba(22, 119, 255, 0.2),
     0 6px 18px rgba(16, 32, 22, 0.24);
+}
+
+.destination-marker {
+  width: 22px;
+  height: 22px;
+  border: 3px solid #ffffff;
+  border-radius: 50% 50% 50% 0;
+  background: #d93636;
+  box-shadow: 0 8px 20px rgba(16, 32, 22, 0.26);
+  transform: rotate(-45deg);
+}
+
+.destination-marker::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: #ffffff;
 }
 
 .maplibregl-ctrl-bottom-right {
