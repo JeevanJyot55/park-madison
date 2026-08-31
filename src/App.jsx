@@ -14,31 +14,21 @@ const SERVICE_AREA = {
     type: 'Polygon',
     coordinates: [
       [
-        [-89.4298, 43.0892],
-        [-89.3794, 43.0892],
-        [-89.3708, 43.0675],
-        [-89.3927, 43.0489],
-        [-89.4318, 43.0554],
-        [-89.4402, 43.0735],
-        [-89.4298, 43.0892],
+        [-89.4318, 43.0769],
+        [-89.4209, 43.0809],
+        [-89.4019, 43.0831],
+        [-89.3828, 43.0822],
+        [-89.3737, 43.0781],
+        [-89.3696, 43.0712],
+        [-89.3743, 43.0652],
+        [-89.3827, 43.0611],
+        [-89.3935, 43.0566],
+        [-89.4058, 43.0525],
+        [-89.4212, 43.0557],
+        [-89.4338, 43.0631],
+        [-89.4387, 43.0701],
+        [-89.4318, 43.0769],
       ],
-    ],
-  },
-};
-const SERVICE_MASK = {
-  type: 'Feature',
-  properties: {},
-  geometry: {
-    type: 'Polygon',
-    coordinates: [
-      [
-        [-180, 90],
-        [180, 90],
-        [180, -90],
-        [-180, -90],
-        [-180, 90],
-      ],
-      SERVICE_AREA.geometry.coordinates[0],
     ],
   },
 };
@@ -81,28 +71,13 @@ function App() {
         data: SERVICE_AREA,
       });
 
-      mapRef.current.addSource('service-mask', {
-        type: 'geojson',
-        data: SERVICE_MASK,
-      });
-
-      mapRef.current.addLayer({
-        id: 'outside-service-area',
-        type: 'fill',
-        source: 'service-mask',
-        paint: {
-          'fill-color': '#0d1611',
-          'fill-opacity': 0.32,
-        },
-      });
-
       mapRef.current.addLayer({
         id: 'service-area-fill',
         type: 'fill',
         source: 'service-area',
         paint: {
-          'fill-color': '#2b7a4b',
-          'fill-opacity': 0.1,
+          'fill-color': '#35b86f',
+          'fill-opacity': 0.2,
         },
       });
 
@@ -111,9 +86,9 @@ function App() {
         type: 'line',
         source: 'service-area',
         paint: {
-          'line-color': '#1f6f43',
-          'line-width': 3,
-          'line-opacity': 0.9,
+          'line-color': '#12884a',
+          'line-width': 3.5,
+          'line-opacity': 0.95,
         },
       });
     });
