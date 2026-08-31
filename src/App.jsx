@@ -112,8 +112,19 @@ function App() {
 
         <aside className="parking-sheet" aria-labelledby="parking-sheet-title">
           <div className="sheet-handle" aria-hidden="true" />
-          <p className="sheet-label">Current area</p>
-          <h2 id="parking-sheet-title">UW-Madison / downtown</h2>
+          <label className="destination-field" htmlFor="destination-search">
+            <span className="sheet-label">Where are you going?</span>
+            <input
+              id="destination-search"
+              type="search"
+              placeholder="Search destination"
+              autoComplete="off"
+            />
+          </label>
+          <div className="sheet-section">
+            <p className="sheet-label">Current area</p>
+            <h2 id="parking-sheet-title">UW-Madison / downtown</h2>
+          </div>
           <p className={`sheet-copy status-${locationStatus}`}>
             {locationMessage}
           </p>
