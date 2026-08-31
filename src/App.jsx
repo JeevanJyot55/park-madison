@@ -44,6 +44,16 @@ function App() {
           <p className="eyebrow">Madison, Wisconsin</p>
           <h1 id="app-title">Park Madison</h1>
         </header>
+
+        <aside className="parking-sheet" aria-labelledby="parking-sheet-title">
+          <div className="sheet-handle" aria-hidden="true" />
+          <p className="sheet-label">Current area</p>
+          <h2 id="parking-sheet-title">UW-Madison / downtown</h2>
+          <p className="sheet-copy">
+            Nearby parking options will appear here once we add the first data
+            source.
+          </p>
+        </aside>
       </section>
     </main>
   );
